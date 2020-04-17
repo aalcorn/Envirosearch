@@ -164,8 +164,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         connection = (HttpURLConnection) url.openConnection();
 
                         connection.setRequestMethod("GET");
-                        connection.setConnectTimeout(5000);
-                        connection.setReadTimeout(5000);
+                        connection.setConnectTimeout(10000);
+                        connection.setReadTimeout(10000);
 
                         int status = connection.getResponseCode();
                         System.out.println(status);
