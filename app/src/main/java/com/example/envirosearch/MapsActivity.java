@@ -99,6 +99,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").snippet("http://hgsengineeringinc.com/"));
                     float zoomLevel = 11.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
                     getJson();
                 }
 
