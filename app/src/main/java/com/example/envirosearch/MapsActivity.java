@@ -3,12 +3,17 @@ package com.example.envirosearch;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.DrawableContainer;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.UiThread;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -25,6 +30,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -51,6 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public double lat;
     public double lon;
     public FusedLocationProviderClient client;
+    int radius = 5;
+    private boolean checked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +70,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        radius = Integer.parseInt(getIntent().getExtras().getString("radius"));
+        checked = getIntent().getExtras().getBoolean("checked");
 
         client = LocationServices.getFusedLocationProviderClient(this);
 
@@ -91,15 +103,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onSuccess(Location location) {
 
-                if(location != null) { //
+                if(location != null) { //Finds user location and places a marker on the map, then begins the query
                     Log.d("tag",Double.toString(location.getLongitude()));
                     lat = Math.round(location.getLatitude()*100.0)/100.0;
                     lon = Math.round(location.getLongitude()*100.0)/100.0;
                     LatLng userLoc = new LatLng(lat,lon);
-                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").snippet("http://hgsengineeringinc.com/"));
-                    float zoomLevel = 11.0f;
+                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").snippet("http://hgsengineeringinc.com/").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    float zoomLevel = 12.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
-                    //mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
                     getJson();
                 }
 
@@ -124,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     try {
 
                         // Set up and perform get request
-                        URL url = new URL("https://ofmpub.epa.gov/echo/echo_rest_services.get_facility_info?output=JSON&p_lat=" + lat + "&p_long="+ lon + "&p_radius=4");
+                        URL url = new URL("https://ofmpub.epa.gov/echo/echo_rest_services.get_facility_info?output=JSON&p_lat=" + lat + "&p_long="+ lon + "&p_radius=" + radius);
                         connection = (HttpURLConnection) url.openConnection();
 
                         connection.setRequestMethod("GET");
@@ -135,6 +146,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         if (status> 299) { // Error code
                             reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                            showToast("ERROR: Cannot connect to EPA server. Try again.");
                             while((line = reader.readLine()) != null) {
                                 responseContent.append(line);
                             }
@@ -142,6 +154,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         else { // Populate responseContent with info from get request
                             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            showToast("Searching...");
                             while((line = reader.readLine()) != null) {
                                 responseContent.append(line);
                             }
@@ -172,36 +185,93 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         JSONObject Results = new JSONObject(facilities.get("Results").toString()); // JSON object containing JSON arrays and data
 
-        JSONArray facList = new JSONArray(Results.get("Facilities").toString()); // A list of JSON objects of facilities
-        System.out.println(facList.length());
+        if (Results.getInt("QueryRows") < 4950) {
+            JSONArray facList = new JSONArray(Results.get("Facilities").toString()); // A list of JSON objects of facilities
+            System.out.println(facList.length());
+
+            // Loops through JSON objects in facList and creates objects for them, then gets their relevant data
+            for (int i = 0; i < facList.length(); i++) {
+                JSONObject obj = facList.getJSONObject(i);
+                final ArrayList<String> facilList = new ArrayList<String>();
+                facilList.add(obj.getString("FacName"));
+                facilList.add(obj.getString("FacLat"));
+                facilList.add(obj.getString("FacLong"));
+                facilList.add(obj.getString("RegistryID"));
+                facilList.add(obj.getString("FacPenaltyCount"));
+                facilList.add(obj.getString("FacQtrsWithNC"));
+
+                //System.out.println(obj.getString("FacQtrsWithNC"));
+                //System.out.println(facilList.get(5));
 
 
-        // Loops through JSON objects in facList and creates objects for them, then gets their relevant data
-        for (int i = 0; i < facList.length(); i++) {
-            JSONObject obj = facList.getJSONObject(i);
-            final ArrayList<String> facilList = new ArrayList<String>();
-            facilList.add(obj.getString("FacName"));
-            facilList.add(obj.getString("FacLat"));
-            facilList.add(obj.getString("FacLong"));
-            facilList.add(obj.getString("RegistryID"));
-
-
-            if (obj.getString("FacPenaltyCount") != "null") { // Checks if a facility has penalties. If so, adds a marker
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
-                        mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)));
-                        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                if (facilList.get(5) != "null") {
+                    if (Integer.parseInt(obj.getString("FacQtrsWithNC")) >= 7) {
+                        runOnUiThread(new Runnable() {
                             @Override
-                            public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
-                                startActivity(browserIntent);
+                            public void run() {
+                                LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
+                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                    @Override
+                                    public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
+                                        startActivity(browserIntent);
+                                    }
+                                });
                             }
                         });
                     }
-                });
+                    else if (Integer.parseInt(obj.getString("FacQtrsWithNC")) > 0) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
+                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                    @Override
+                                    public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
+                                        startActivity(browserIntent);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else if (Integer.parseInt(obj.getString("FacQtrsWithNC")) == 0 && !checked){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
+                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                    @Override
+                                    public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
+                                        startActivity(browserIntent);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+
             }
         }
+        else {
+            showToast("Too many facilities! Please lower radius and try again. ");
+        }
+
+    }
+
+    public void showToast(String text) {
+        final String textToShow = text;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.map), textToShow, Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
     }
 }
+
