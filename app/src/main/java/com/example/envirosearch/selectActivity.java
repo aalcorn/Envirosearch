@@ -21,7 +21,7 @@ public class selectActivity extends AppCompatActivity {
     private SeekBar seekBar;
     private Button searchButton;
     private CheckBox checkBox;
-    private int radius = 5;
+    private double radius = 5;
 
 
     @Override
@@ -33,7 +33,6 @@ public class selectActivity extends AppCompatActivity {
         toolbar.setBackgroundColor(0xFF0f0054);
         //toolbar.getBackground().setColorFilter("#");
         setSupportActionBar(toolbar);
-
         requestPermission();
 
         milesView = findViewById(R.id.milesView);
@@ -45,7 +44,7 @@ public class selectActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(selectActivity.this, MapsActivity.class);
-                intent.putExtra("radius", Integer.toString(radius));
+                intent.putExtra("radius", Double.toString(radius));
                 intent.putExtra("checked", checkBox.isChecked());
                 startActivity(intent);
             }
@@ -54,14 +53,15 @@ public class selectActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress > 1) {
-                    milesView.setText(progress + " Miles");
+                double prog = Double.parseDouble(Integer.toString(progress))/10;
+                if (prog == 1) {
+                    milesView.setText(prog + " Mile");
                 }
                 else {
-                    milesView.setText(progress + " Mile");
+                    milesView.setText(prog + " Miles");
                 }
-                radius = progress;
-                //System.out.println(radius);
+                radius = prog;
+                System.out.println(radius);
             }
 
             @Override

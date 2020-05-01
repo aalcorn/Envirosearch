@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
@@ -58,8 +59,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public double lat;
     public double lon;
     public FusedLocationProviderClient client;
-    int radius = 5;
-    private boolean checked = false;
+    public double radius = 5;
+    private boolean boxChecked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        radius = Integer.parseInt(getIntent().getExtras().getString("radius"));
-        checked = getIntent().getExtras().getBoolean("checked");
+        radius = Double.parseDouble(getIntent().getExtras().getString("radius"));
+        boxChecked = getIntent().getExtras().getBoolean("checked");
 
         client = LocationServices.getFusedLocationProviderClient(this);
 
@@ -91,6 +92,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        LatLng test = new LatLng(0,0);
+        mMap.addMarker(new MarkerOptions().position(test).title("test").icon(BitmapDescriptorFactory.fromResource(R.drawable.adamsmokestack)));
+
         getLoc();
     }
 
@@ -110,6 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LatLng userLoc = new LatLng(lat,lon);
                     mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").snippet("http://hgsengineeringinc.com/").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                     float zoomLevel = 12.0f;
+                    //todo: Add custom zoom level based on the radius
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
                     getJson();
                 }
@@ -210,12 +215,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             @Override
                             public void run() {
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
-                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                                //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                                     @Override
                                     public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
-                                        startActivity(browserIntent);
+                                        //startActivity(browserIntent);
+                                        Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
+                                        facilIntent.putExtra("id", Uri.parse(marker.getSnippet()));
+                                        startActivity(facilIntent);
                                     }
                                 });
                             }
@@ -226,18 +235,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             @Override
                             public void run() {
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
-                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                                //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                                mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                                     @Override
                                     public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
-                                        startActivity(browserIntent);
+                                        //startActivity(browserIntent);
+                                        Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
+                                        facilIntent.putExtra("id", Uri.parse(marker.getSnippet()+ ""));
+                                        startActivity(facilIntent);
                                     }
                                 });
                             }
                         });
                     }
-                    else if (Integer.parseInt(obj.getString("FacQtrsWithNC")) == 0 && !checked){
+                    else if (Integer.parseInt(obj.getString("FacQtrsWithNC")) == 0 && !boxChecked){
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -256,6 +269,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
             }
+            showToast("Finished");
         }
         else {
             showToast("Too many facilities! Please lower radius and try again. ");
