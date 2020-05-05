@@ -21,6 +21,10 @@ public class selectActivity extends AppCompatActivity {
     private SeekBar seekBar;
     private Button searchButton;
     private CheckBox checkBox;
+    private CheckBox CAABox;
+    private CheckBox CWABox;
+    private CheckBox RCRABox;
+    private CheckBox SDWABox;
     private double radius = 5;
 
 
@@ -39,6 +43,10 @@ public class selectActivity extends AppCompatActivity {
         seekBar = findViewById(R.id.seekBar);
         searchButton = findViewById(R.id.searchButton);
         checkBox = findViewById(R.id.checkBox);
+        CAABox = findViewById(R.id.CAABox);
+        CWABox = findViewById(R.id.CWABox);
+        RCRABox = findViewById(R.id.RCRABox);
+        SDWABox = findViewById(R.id.SDWABox);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,6 +54,10 @@ public class selectActivity extends AppCompatActivity {
                 Intent intent = new Intent(selectActivity.this, MapsActivity.class);
                 intent.putExtra("radius", Double.toString(radius));
                 intent.putExtra("checked", checkBox.isChecked());
+                intent.putExtra("CAAChecked", CAABox.isChecked());
+                intent.putExtra("CWAChecked", CWABox.isChecked());
+                intent.putExtra("RCRAChecked", RCRABox.isChecked());
+                intent.putExtra("SDWAChecked", SDWABox.isChecked());
                 startActivity(intent);
             }
         });
