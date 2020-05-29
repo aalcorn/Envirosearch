@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,16 +22,29 @@ public class facilActivity extends AppCompatActivity {
     private HttpURLConnection connection;
     private String id;
 
+    TextView facName;
+    TextView facStreet;
+    TextView facState;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_facil);
 
-        //Get facility ID from intent
-        //Make GET request
-        //Fill in necessary fields with git request info
+        facName = findViewById(R.id.facNameTextView);
+        facStreet = findViewById(R.id.FacStreetTextView);
+        facState = findViewById(R.id.FacStateTextView);
 
+        //Get facility ID from intent
         id = getIntent().getExtras().getString("id");
+        //TextView textView = findViewById(R.id.textView);
+        //textView.setText(id);
+
+        //Make GET request
+        getFacilJson();
+
+        //Fill in fields with info
 
     }
 
@@ -68,7 +85,30 @@ public class facilActivity extends AppCompatActivity {
                             reader.close();
                         }
 
-                        //parse(responseContent.toString());
+                        //System.out.println(responseContent.toString());
+                        //parse the content
+                        JSONObject facilityInfo = new JSONObject(responseContent.toString());
+                        JSONObject results = new JSONObject(facilityInfo.get("Results").toString());
+                        JSONArray permits = new JSONArray(results.get("Permits").toString());
+                        final JSONObject permitObject = new JSONObject(permits.get(0).toString());
+                        //System.out.println(permits.get(0));
+
+
+                        //set Facility Address
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    facName.setText(permitObject.getString("FacilityName"));
+                                    facStreet.setText(permitObject.getString("FacilityStreet") + " " + permitObject.getString("FacilityCity"));
+                                    facState.setText(permitObject.getString("FacilityState") + " " + permitObject.getString("FacilityZip"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+
 
                     } catch (MalformedURLException e) {
                         e.printStackTrace();

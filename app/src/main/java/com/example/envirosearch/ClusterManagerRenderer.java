@@ -1,10 +1,16 @@
 package com.example.envirosearch;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -21,9 +27,25 @@ public class ClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker
 
         iconGenerator = new IconGenerator(context.getApplicationContext());
         imageView = new ImageView(context.getApplicationContext());
-        markerWidth = 20;  // these values are not certain, play around with them
-        markerHeight = 20;
+        markerWidth = 100;  // these values are not certain, play around with them
+        markerHeight = 100;
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(markerWidth,markerHeight));
+
+        int padding = 8;
+        imageView.setPadding(padding,padding,padding,padding);
+        iconGenerator.setContentView(imageView);
+
     }
 
-    //continue here
+    @Override
+    protected boolean shouldRenderAsCluster(Cluster<ClusterMarker> cluster) {
+        return false;
+    }
+
+    @Override
+    protected void onBeforeClusterItemRendered(ClusterMarker item, MarkerOptions markerOptions) {
+        imageView.setImageResource(item.getIconPicture());
+        Bitmap icon = iconGenerator.makeIcon();
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(item.getTitle());
+    }
 }

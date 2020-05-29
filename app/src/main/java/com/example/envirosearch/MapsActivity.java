@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean SDWAChecked = false;
     private ImageView legend;
     private Button showhide;
+    private ClusterManager mClusterManager;
+    private ClusterManagerRenderer mClusterManagerRenderer;
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +126,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //LatLng test = new LatLng(0,0);
+        mClusterManager = new ClusterManager<ClusterMarker>(MapsActivity.this, mMap);
+        mClusterManagerRenderer = new ClusterManagerRenderer(MapsActivity.this, mMap, mClusterManager);
+        mClusterManager.setRenderer(mClusterManagerRenderer);
+
+
+
+        LatLng test = new LatLng(0,0);
         //mMap.addMarker(new MarkerOptions().position(test).title("test").icon(BitmapDescriptorFactory.fromResource(R.drawable.adamsmokestack)));
+        //ClusterMarker marker = new ClusterMarker(test, "test", "testing", R.drawable.thelegend27);
+        //mClusterManager.addItem(marker);
+        //mClusterManager.cluster();
 
         getLoc();
     }
@@ -208,6 +221,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (Exception e) {
                     showToast("Failed to Connect! Try again.");
                 }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mClusterManager.cluster();
+                    }
+                });
+
             }
         });
         thread.start();
@@ -221,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         JSONObject Results = new JSONObject(facilities.get("Results").toString()); // JSON object containing JSON arrays and data
 
         if (Results.getInt("QueryRows") < 4950) {
-            JSONArray facList = new JSONArray(Results.get("Facilities").toString()); // A list of JSON objects of facilities
+            final JSONArray facList = new JSONArray(Results.get("Facilities").toString()); // A list of JSON objects of facilities
             System.out.println(facList.length());
 
             // Loops through JSON objects in facList and creates objects for them, then gets their relevant data
@@ -240,6 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 final String SDWA = obj.getString("SDWAComplianceStatus");
 
 
+
                 if (facilList.get(5) != "null") {
                     if (Integer.parseInt(obj.getString("FacQtrsWithNC")) >= 7) {
                         runOnUiThread(new Runnable() {
@@ -247,32 +268,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             public void run() {
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
+                                    //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.redwater);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redsmoke)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.redsmoke);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redhazard)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.redhazard);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.reddrinkingwater)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.reddrinkingwater);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
                                     mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                                    @Override
-                                    public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
-                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
-                                        //startActivity(browserIntent);
-                                        Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
-                                        facilIntent.putExtra("id", marker.getSnippet());
-                                        startActivity(facilIntent);
-                                    }
-                                });
+
                             }
                         });
                     }
@@ -282,32 +295,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             public void run() {
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.orangewater)));
+                                    //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangewater);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.orangesmoke)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangesmoke);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.orangehazard)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangehazard);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.orangedrinkingwater)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangedrinkingwater);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
                                     mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                                    @Override
-                                    public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
-                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
-                                        //startActivity(browserIntent);
-                                        Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
-                                        facilIntent.putExtra("id", marker.getSnippet());
-                                        startActivity(facilIntent);
-                                    }
-                                });
+
                             }
                         });
                     }
@@ -317,38 +322,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             public void run() {
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.greenwater)));
+                                    //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greenwater);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.greensmoke)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greensmoke);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.greenhazard)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greenhazard);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.greendrinkingwater)));
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greendrinkingwater);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
                                     mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                                    @Override
-                                    public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
-                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getSnippet()));
-                                        //startActivity(browserIntent);
-                                        Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
-                                        facilIntent.putExtra("id", marker.getSnippet());
-                                        startActivity(facilIntent);
-                                    }
-                                });
+
                             }
                         });
                     }
                 }
 
             }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
+                            String website = "https://echo.epa.gov/detailed-facility-report?fid=" + marker.getSnippet();
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(website));
+                            startActivity(browserIntent);
+                            Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
+                            facilIntent.putExtra("id", marker.getSnippet());
+                            //startActivity(facilIntent);
+                        }
+                    });
+                }
+            });
             showToast("Finished");
         }
         else {
@@ -366,6 +379,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 snackbar.show();
             }
         });
+    }
+
+    private void makeMarker(LatLng positiion, String title, String snippet, int iconPicture) {
+        ClusterMarker newClusterMarker = new ClusterMarker(positiion,title,snippet,iconPicture);
+        mClusterManager.addItem(newClusterMarker);
+        mClusterMarkers.add(newClusterMarker);
     }
 }
 

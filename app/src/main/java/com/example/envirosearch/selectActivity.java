@@ -1,6 +1,9 @@
 package com.example.envirosearch;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +15,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -38,6 +44,14 @@ public class selectActivity extends AppCompatActivity {
         //toolbar.getBackground().setColorFilter("#");
         setSupportActionBar(toolbar);
         requestPermission();
+
+
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        boolean firstStart = prefs.getBoolean("firstStart", true);
+
+        if(firstStart) {
+            firstStartDia();
+        }
 
         milesView = findViewById(R.id.milesView);
         seekBar = findViewById(R.id.seekBar);
@@ -91,6 +105,29 @@ public class selectActivity extends AppCompatActivity {
 
     private void requestPermission(){
         ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},1);
+    }
+
+    private void firstStartDia() {
+        new AlertDialog.Builder(selectActivity.this)
+                .setTitle("")
+                .setMessage("I acknowledge that all information presented by this application is retrieved from publicly available records.")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("firstStart", false);
+                        editor.apply();
+                    }
+                })
+
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int id = android.os.Process.myPid();
+                        android.os.Process.killProcess(id);
+                    }
+                }).create().show();
     }
 
 }
