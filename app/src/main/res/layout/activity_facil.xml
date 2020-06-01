@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="7dp"
     tools:context=".facilActivity">
 
 
@@ -14,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:text="FacName"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +30,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="FacStreet/City"
-        android:textSize="18sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/facNameTextView" />
@@ -44,7 +45,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="FacState/Zip"
-        android:textSize="18sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/FacStreetTextView" />
@@ -61,7 +62,7 @@
         android:gravity="center_horizontal"
         android:text="Enforcement and Compliance Overview:"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.482"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +74,7 @@
         android:layout_height="wrap_content"
         android:text="Regulatory Info:"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
@@ -82,175 +83,303 @@
         android:id="@+id/tableLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:showDividers="none"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.346"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/summaryTextView">
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup">
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/CAATextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:padding="10sp"
-                android:text="CAA"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <TextView
-                android:id="@+id/CWATextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="CWA"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <TextView
-                android:id="@+id/RCRATextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="RCRA"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <TextView
-                android:id="@+id/SDWATextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="SDWA"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Insp"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/InspTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
 
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/textView13"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textView14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Last Insp"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/LastInspTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
 
-            <TextView
-                android:id="@+id/textView16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/textView17"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/textView18"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TextView"
-                android:padding="10sp" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textView19"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Compliance Status"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/textView20"
+                android:id="@+id/VioTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="No Violation Identified" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/textView21"
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Qtrs With NC"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/NCTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Qtrs With Significant Violation"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/SNCTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Informal Enforcement Actions"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/InformalTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Formal Enforcement Actions"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/FormalTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Penalties From Enforcement"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/penaltyTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="EPA Cases"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/casesTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textView22"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
+                android:background="@drawable/cell_shape"
+                android:padding="7dp"
+                android:text="Penalties From EPA Cases"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/textView23"
+                android:id="@+id/epaPenaltiesTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="TextView" />
+                android:background="@drawable/cell_shape"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="-" />
         </TableRow>
     </TableLayout>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/summaryTextView">
+
+        <RadioButton
+            android:id="@+id/CAAButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CAA" />
+
+        <RadioButton
+            android:id="@+id/CWAButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CWA" />
+
+        <RadioButton
+            android:id="@+id/RCRAButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="RCRA" />
+
+        <RadioButton
+            android:id="@+id/SDWAButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SDWA" />
+    </RadioGroup>
 
 </android.support.constraint.ConstraintLayout>

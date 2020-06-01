@@ -1,8 +1,11 @@
 package com.example.envirosearch;
 
+import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -26,15 +29,52 @@ public class facilActivity extends AppCompatActivity {
     TextView facStreet;
     TextView facState;
 
+    TextView inspText;
+    TextView lastInspText;
+    TextView compStatusText;
+    TextView QtrsNCText;
+    TextView QtrsSNCText;
+    TextView infActText;
+    TextView fActText;
+    TextView penaltyText;
+    TextView epaText;
+    TextView epaPenText;
+
+    RadioButton CAAButton;
+    RadioButton CWAButton;
+    RadioButton RCRAButton;
+    RadioButton SDWAButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_facil);
 
+        CAAButton = findViewById(R.id.CAAButton);
+        CWAButton = findViewById(R.id.CWAButton);
+        RCRAButton = findViewById(R.id.RCRAButton);
+        SDWAButton = findViewById(R.id.SDWAButton);
+
+        CAAButton.setEnabled(false);
+        CWAButton.setEnabled(false);
+        RCRAButton.setEnabled(false);
+        SDWAButton.setEnabled(false);
+
         facName = findViewById(R.id.facNameTextView);
         facStreet = findViewById(R.id.FacStreetTextView);
         facState = findViewById(R.id.FacStateTextView);
+
+        inspText = findViewById(R.id.InspTextView);
+        lastInspText = findViewById(R.id.LastInspTextView);
+        compStatusText = findViewById(R.id.VioTextView);
+        QtrsNCText = findViewById(R.id.NCTextView);
+        QtrsSNCText = findViewById(R.id.SNCTextView);
+        infActText = findViewById(R.id.InformalTextView);
+        fActText = findViewById(R.id.FormalTextView);
+        penaltyText = findViewById(R.id.penaltyTextView);
+        epaText = findViewById(R.id.casesTextView);
+        epaPenText = findViewById(R.id.epaPenaltiesTextView);
 
         //Get facility ID from intent
         id = getIntent().getExtras().getString("id");
@@ -85,13 +125,15 @@ public class facilActivity extends AppCompatActivity {
                             reader.close();
                         }
 
-                        //System.out.println(responseContent.toString());
                         //parse the content
                         JSONObject facilityInfo = new JSONObject(responseContent.toString());
                         JSONObject results = new JSONObject(facilityInfo.get("Results").toString());
-                        JSONArray permits = new JSONArray(results.get("Permits").toString());
+                        final JSONArray permits = new JSONArray(results.get("Permits").toString());
+                        final JSONObject enforcementSummaries = new JSONObject(results.get("EnforcementComplianceSummaries").toString());
+                        final JSONArray summaries = new JSONArray(enforcementSummaries.get("Summaries").toString());
                         final JSONObject permitObject = new JSONObject(permits.get(0).toString());
                         //System.out.println(permits.get(0));
+                        System.out.println(summaries.toString());
 
 
                         //set Facility Address
@@ -109,6 +151,135 @@ public class facilActivity extends AppCompatActivity {
                         });
 
 
+                        for(int i = 0; i < summaries.length(); i++) {
+                            JSONObject sum = new JSONObject(summaries.get(i).toString());
+                            if(sum.getString("Statute").equals("CAA")) {
+                                CAAButton.setEnabled(true);
+                            }
+                            else if(sum.getString("Statute").equals("CWA")) {
+                                CWAButton.setEnabled(true);
+                            }
+                            else if(sum.getString("Statute").equals("RCRA")) {
+                                RCRAButton.setEnabled(true);
+                            }
+                            else if(sum.getString("Statute").equals("SDWA")) {
+                                SDWAButton.setEnabled(true);
+                            }
+                        }
+
+                        //ON CLICK LISTNERS FOR BUTTONS: EACH POPULATES TABLE WITH DATA RELATED TO STATUTE
+                        CAAButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //System.out.println("CAA");
+                                for(int i = 0; i < summaries.length(); i++) {
+                                    JSONObject sum;
+                                    try {
+                                        sum = new JSONObject(summaries.get(i).toString());
+                                        System.out.println(sum.getString("Statute"));
+                                        if(sum.getString("Statute").equals("CAA")) {
+                                            System.out.println("Got it!");
+                                            inspText.setText(sum.getString("Inspections"));
+                                            lastInspText.setText(sum.getString("LastInspection"));
+                                            compStatusText.setText(sum.getString("CurrentStatus"));
+                                            QtrsNCText.setText(sum.getString("QtrsInNC"));
+                                            QtrsSNCText.setText(sum.getString("QtrsInSNC"));
+                                            infActText.setText(sum.getString("InformalActions"));
+                                            fActText.setText(sum.getString("FormalActions"));
+                                            penaltyText.setText(sum.getString("TotalPenalties"));
+                                            epaText.setText(sum.getString("Cases"));
+                                            epaPenText.setText(sum.getString("TotalCasePenalties"));
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
+
+                        CWAButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                for(int i = 0; i < summaries.length(); i++) {
+                                    JSONObject sum;
+                                    try {
+                                        sum = new JSONObject(summaries.get(i).toString());
+                                        System.out.println(sum.getString("Statute"));
+                                        if(sum.getString("Statute").equals("CWA")) {
+                                            System.out.println("Got it!");
+                                            inspText.setText(sum.getString("Inspections"));
+                                            lastInspText.setText(sum.getString("LastInspection"));
+                                            compStatusText.setText(sum.getString("CurrentStatus"));
+                                            QtrsNCText.setText(sum.getString("QtrsInNC"));
+                                            QtrsSNCText.setText(sum.getString("QtrsInSNC"));
+                                            infActText.setText(sum.getString("InformalActions"));
+                                            fActText.setText(sum.getString("FormalActions"));
+                                            penaltyText.setText(sum.getString("TotalPenalties"));
+                                            epaText.setText(sum.getString("Cases"));
+                                            epaPenText.setText(sum.getString("TotalCasePenalties"));
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
+
+                        RCRAButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                for(int i = 0; i < summaries.length(); i++) {
+                                    JSONObject sum;
+                                    try {
+                                        sum = new JSONObject(summaries.get(i).toString());
+                                        System.out.println(sum.getString("Statute"));
+                                        if(sum.getString("Statute").equals("RCRA")) {
+                                            System.out.println("Got it!");
+                                            inspText.setText(sum.getString("Inspections"));
+                                            lastInspText.setText(sum.getString("LastInspection"));
+                                            compStatusText.setText(sum.getString("CurrentStatus"));
+                                            QtrsNCText.setText(sum.getString("QtrsInNC"));
+                                            QtrsSNCText.setText(sum.getString("QtrsInSNC"));
+                                            infActText.setText(sum.getString("InformalActions"));
+                                            fActText.setText(sum.getString("FormalActions"));
+                                            penaltyText.setText(sum.getString("TotalPenalties"));
+                                            epaText.setText(sum.getString("Cases"));
+                                            epaPenText.setText(sum.getString("TotalCasePenalties"));
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
+
+                        SDWAButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                for(int i = 0; i < summaries.length(); i++) {
+                                    JSONObject sum;
+                                    try {
+                                        sum = new JSONObject(summaries.get(i).toString());
+                                        System.out.println(sum.getString("Statute"));
+                                        if(sum.getString("Statute").equals("SDWA")) {
+                                            System.out.println("Got it!");
+                                            inspText.setText(sum.getString("Inspections"));
+                                            lastInspText.setText(sum.getString("LastInspection"));
+                                            compStatusText.setText(sum.getString("CurrentStatus"));
+                                            QtrsNCText.setText(sum.getString("QtrsInNC"));
+                                            QtrsSNCText.setText(sum.getString("QtrsInSNC"));
+                                            infActText.setText(sum.getString("InformalActions"));
+                                            fActText.setText(sum.getString("FormalActions"));
+                                            penaltyText.setText(sum.getString("TotalPenalties"));
+                                            epaText.setText(sum.getString("Cases"));
+                                            epaPenText.setText(sum.getString("TotalCasePenalties"));
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
 
                     } catch (MalformedURLException e) {
                         e.printStackTrace();

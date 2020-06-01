@@ -354,10 +354,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
                             String website = "https://echo.epa.gov/detailed-facility-report?fid=" + marker.getSnippet();
                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(website));
-                            startActivity(browserIntent);
+                            //startActivity(browserIntent);
                             Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
                             facilIntent.putExtra("id", marker.getSnippet());
-                            //startActivity(facilIntent);
+                            startActivity(facilIntent);
                         }
                     });
                 }
