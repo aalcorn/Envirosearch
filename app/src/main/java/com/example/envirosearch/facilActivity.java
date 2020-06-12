@@ -1,5 +1,7 @@
 package com.example.envirosearch;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,6 +9,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class facilActivity extends AppCompatActivity {
 
@@ -40,6 +47,9 @@ public class facilActivity extends AppCompatActivity {
     TextView epaText;
     TextView epaPenText;
 
+    TextView epaInfo;
+    TextView epaRegion;
+
     RadioButton CAAButton;
     RadioButton CWAButton;
     RadioButton RCRAButton;
@@ -50,6 +60,19 @@ public class facilActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_facil);
+
+        AdView adView = findViewById(R.id.facilAdView);
+
+        MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
+
+
+
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        adView.loadAd(adRequest);
+
 
         CAAButton = findViewById(R.id.CAAButton);
         CWAButton = findViewById(R.id.CWAButton);
@@ -76,15 +99,23 @@ public class facilActivity extends AppCompatActivity {
         epaText = findViewById(R.id.casesTextView);
         epaPenText = findViewById(R.id.epaPenaltiesTextView);
 
+
         //Get facility ID from intent
         id = getIntent().getExtras().getString("id");
-        //TextView textView = findViewById(R.id.textView);
-        //textView.setText(id);
+        epaInfo = findViewById(R.id.epaInfoTextView);
+        epaInfo.setText("https://echo.epa.gov/");
+        epaInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://echo.epa.gov/detailed-facility-report?fid=" + id));
+                startActivity(browserIntent);
+            }
+        });
+
+        epaRegion = findViewById(R.id.epaRegionTextView);
 
         //Make GET request
         getFacilJson();
-
-        //Fill in fields with info
 
     }
 
@@ -150,20 +181,42 @@ public class facilActivity extends AppCompatActivity {
                             }
                         });
 
+                        setEPAinfo();
 
+                        //Enable only buttons with statute records
                         for(int i = 0; i < summaries.length(); i++) {
                             JSONObject sum = new JSONObject(summaries.get(i).toString());
                             if(sum.getString("Statute").equals("CAA")) {
-                                CAAButton.setEnabled(true);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        CAAButton.setEnabled(true);
+                                    }
+                                });
                             }
                             else if(sum.getString("Statute").equals("CWA")) {
-                                CWAButton.setEnabled(true);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        CWAButton.setEnabled(true);
+                                    }
+                                });
                             }
                             else if(sum.getString("Statute").equals("RCRA")) {
-                                RCRAButton.setEnabled(true);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        RCRAButton.setEnabled(true);
+                                    }
+                                });
                             }
                             else if(sum.getString("Statute").equals("SDWA")) {
-                                SDWAButton.setEnabled(true);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        SDWAButton.setEnabled(true);
+                                    }
+                                });
                             }
                         }
 
@@ -189,6 +242,8 @@ public class facilActivity extends AppCompatActivity {
                                             penaltyText.setText(sum.getString("TotalPenalties"));
                                             epaText.setText(sum.getString("Cases"));
                                             epaPenText.setText(sum.getString("TotalCasePenalties"));
+
+                                            changeNull();
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -217,6 +272,8 @@ public class facilActivity extends AppCompatActivity {
                                             penaltyText.setText(sum.getString("TotalPenalties"));
                                             epaText.setText(sum.getString("Cases"));
                                             epaPenText.setText(sum.getString("TotalCasePenalties"));
+
+                                            changeNull();
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -245,6 +302,8 @@ public class facilActivity extends AppCompatActivity {
                                             penaltyText.setText(sum.getString("TotalPenalties"));
                                             epaText.setText(sum.getString("Cases"));
                                             epaPenText.setText(sum.getString("TotalCasePenalties"));
+
+                                            changeNull();
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -273,6 +332,8 @@ public class facilActivity extends AppCompatActivity {
                                             penaltyText.setText(sum.getString("TotalPenalties"));
                                             epaText.setText(sum.getString("Cases"));
                                             epaPenText.setText(sum.getString("TotalCasePenalties"));
+
+                                            changeNull();
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -293,5 +354,87 @@ public class facilActivity extends AppCompatActivity {
             }
         });
         thread.start();
+    }
+
+    private void setEPAinfo() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String[] stateList = facState.getText().toString().split(" ");
+                String state = stateList[0];
+                System.out.println(state);
+                if(state.equals("CT") || state.equals("ME") || state.equals("MA") || state.equals("NH") || state.equals("RI") || state.equals("VT")) {
+                    //Region 1 - Boston
+                    epaRegion.setText("EPA Region 1: Boston - (617) 918-1010");
+                }
+                else if (state.equals("NJ") || state.equals("NY") || state.equals("Puerto Rico")) {
+                    //Region 2 - New York City
+                    epaRegion.setText("EPA Region 2: New York City - (212) 637-5000");
+                }
+                else if (state.equals("DE") || state.equals("DC") || state.equals("MD") || state.equals("PA") || state.equals("VA") || state.equals("WV")) {
+                    //Region 3 - Philadelphia
+                    epaRegion.setText("EPA Region 3: Philadelphia - (215) 814-5000");
+                }
+                else if (state.equals("AL") || state.equals("FL") || state.equals("GA") || state.equals("KY") || state.equals("MS") || state.equals("NC") || state.equals("SC") || state.equals("TN")) {
+                    //Region 4 - Atlanta
+                    epaRegion.setText("EPA Region 4: Atlanta - (404) 562-9900");
+                }
+                else if (state.equals("IL") || state.equals("IN") || state.equals("MI") || state.equals("MN") || state.equals("OH") || state.equals("WI")) {
+                    //Region 5 - Chicago
+                    epaRegion.setText("EPA Region 5: Chicago - (312) 886-3000");
+                }
+                else if (state.equals("AR") || state.equals("LA") || state.equals("NM") || state.equals("OK") || state.equals("TX")) {
+                    //Region 6 - Dallas
+                    epaRegion.setText("EPA Region 6: Dallas - (214) 665-2200");
+                }
+                else if (state.equals("IA") || state.equals("KS") || state.equals("MO") || state.equals("NE")) {
+                    //Region 7 - Kansas City
+                    epaRegion.setText("EPA Region 7: Kansas City - (913) 551-7003");
+                }
+                else if (state.equals("CO") || state.equals("MT") || state.equals("ND") || state.equals("SD") || state.equals("UT") || state.equals("WY")) {
+                    //Region 8 - Denver
+                    epaRegion.setText("EPA Region 8: Denver - (303) 312-6312");
+                }
+                else if (state.equals("AZ") || state.equals("CA") || state.equals("HI") || state.equals("NV")) {
+                    //Region 9 - San Francisco
+                    epaRegion.setText("EPA Region 9: San Francisco - (415) 947-8700");
+                }
+                else if (state.equals("AK") || state.equals("ID") || state.equals("OR") || state.equals("WA")) {
+                    //Region 10 - Seattle
+                    epaRegion.setText("EPA Region 10: Seattle - (206) 553-1200");
+                }
+                else {
+                    epaRegion.setText("EPA Region not found");
+                }
+            }
+        });
+    }
+
+    //Changes all instances of "null" to dashes for better design
+    private void changeNull() {
+        final ArrayList<TextView> textList = new ArrayList<>();
+        textList.add(inspText);
+        textList.add(lastInspText);
+        textList.add(compStatusText);
+        textList.add(QtrsNCText);
+        textList.add(QtrsSNCText);
+        textList.add(infActText);
+        textList.add(fActText);
+        textList.add(penaltyText);
+        textList.add(epaText);
+        textList.add(epaPenText);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for(int i = 0; i < textList.size();i++) {
+                    if(textList.get(i).getText().equals("null")) {
+                        textList.get(i).setText("-");
+                    }
+                }
+            }
+        });
+
+
     }
 }

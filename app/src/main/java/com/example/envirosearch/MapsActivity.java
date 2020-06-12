@@ -27,8 +27,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,6 +41,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -74,6 +80,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager mClusterManager;
     private ClusterManagerRenderer mClusterManagerRenderer;
     private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
+    private String currentID;
+
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +93,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+
 
         radius = Double.parseDouble(getIntent().getExtras().getString("radius"));
         boxChecked = getIntent().getExtras().getBoolean("checked");
@@ -131,13 +152,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mClusterManager.setRenderer(mClusterManagerRenderer);
 
 
-
         LatLng test = new LatLng(0,0);
         //mMap.addMarker(new MarkerOptions().position(test).title("test").icon(BitmapDescriptorFactory.fromResource(R.drawable.adamsmokestack)));
         //ClusterMarker marker = new ClusterMarker(test, "test", "testing", R.drawable.thelegend27);
         //mClusterManager.addItem(marker);
         //mClusterManager.cluster();
-
         getLoc();
     }
 
@@ -155,8 +174,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lat = Math.round(location.getLatitude()*100.0)/100.0;
                     lon = Math.round(location.getLongitude()*100.0)/100.0;
                     LatLng userLoc = new LatLng(lat,lon);
-                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").snippet("http://hgsengineeringinc.com/").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                    float zoomLevel = 12.0f;
+                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    float zoomLevel = 14.0f; //14.5 good for .5 mile, 11.0 good for 6.5 miles.
+                    zoomLevel -= radius*.6;
                     //todo: Add custom zoom level based on the radius
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
                     getJson();
@@ -339,7 +359,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-
                             }
                         });
                     }
@@ -349,15 +368,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
                     mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
-                        public void onInfoWindowClick(Marker marker) { // Makes info window click take the user to the facility's EPA page
-                            String website = "https://echo.epa.gov/detailed-facility-report?fid=" + marker.getSnippet();
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(website));
-                            //startActivity(browserIntent);
-                            Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
-                            facilIntent.putExtra("id", marker.getSnippet());
-                            startActivity(facilIntent);
+                        public void onInfoWindowClick(Marker marker) { // Makes info window click take user to new facility info page
+                            if(marker.getTag()!=null) {
+                                //String website = "https://echo.epa.gov/detailed-facility-report?fid=" + marker.getTag();
+                                //Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(website));
+                                //startActivity(browserIntent);
+                                Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
+                                facilIntent.putExtra("id", marker.getTag().toString());
+                                startActivity(facilIntent);
+                                //System.out.println(marker.getTag());
+                            }
+
+                        }
+                    });
+
+                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            if(marker.getSnippet() != null) {
+                                marker.setTag(marker.getSnippet());
+                                marker.setSnippet(null);
+                            }
+                            return false;
                         }
                     });
                 }
@@ -382,7 +417,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void makeMarker(LatLng positiion, String title, String snippet, int iconPicture) {
-        ClusterMarker newClusterMarker = new ClusterMarker(positiion,title,snippet,iconPicture);
+        ClusterMarker newClusterMarker = new ClusterMarker(positiion,title,snippet,iconPicture, "Tag");
         mClusterManager.addItem(newClusterMarker);
         mClusterMarkers.add(newClusterMarker);
     }

@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="7dp"
@@ -81,14 +82,11 @@
 
     <TableLayout
         android:id="@+id/tableLayout2"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:showDividers="none"
+        android:stretchColumns="*"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.346"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +98,7 @@
 
             <TextView
                 android:id="@+id/textView9"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -110,7 +108,7 @@
 
             <TextView
                 android:id="@+id/InspTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -125,7 +123,7 @@
 
             <TextView
                 android:id="@+id/textView14"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -135,7 +133,7 @@
 
             <TextView
                 android:id="@+id/LastInspTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -150,17 +148,17 @@
 
             <TextView
                 android:id="@+id/textView19"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
-                android:text="Compliance Status"
+                android:text="Current Compliance Status"
                 android:textColor="@color/common_google_signin_btn_text_dark_focused"
                 android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/VioTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -175,7 +173,7 @@
 
             <TextView
                 android:id="@+id/textView"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -185,8 +183,8 @@
 
             <TextView
                 android:id="@+id/NCTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
                 android:padding="7dp"
@@ -200,7 +198,7 @@
 
             <TextView
                 android:id="@+id/textView6"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -210,7 +208,7 @@
 
             <TextView
                 android:id="@+id/SNCTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -224,7 +222,7 @@
 
             <TextView
                 android:id="@+id/textView11"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -234,7 +232,7 @@
 
             <TextView
                 android:id="@+id/InformalTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -248,7 +246,7 @@
 
             <TextView
                 android:id="@+id/textView12"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -258,7 +256,7 @@
 
             <TextView
                 android:id="@+id/FormalTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -272,7 +270,7 @@
 
             <TextView
                 android:id="@+id/textView16"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -282,7 +280,7 @@
 
             <TextView
                 android:id="@+id/penaltyTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -296,7 +294,7 @@
 
             <TextView
                 android:id="@+id/textView18"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -306,7 +304,7 @@
 
             <TextView
                 android:id="@+id/casesTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -320,7 +318,7 @@
 
             <TextView
                 android:id="@+id/textView22"
-                android:layout_width="wrap_content"
+                android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:padding="7dp"
@@ -330,7 +328,7 @@
 
             <TextView
                 android:id="@+id/epaPenaltiesTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/cell_shape"
                 android:gravity="center"
@@ -381,5 +379,49 @@
             android:layout_weight="1"
             android:text="SDWA" />
     </RadioGroup>
+
+    <TextView
+        android:id="@+id/tex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="More Info:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/epaRegionTextView" />
+
+    <TextView
+        android:id="@+id/epaInfoTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/holo_blue_dark"
+        app:layout_constraintStart_toEndOf="@+id/tex"
+        app:layout_constraintTop_toBottomOf="@+id/epaRegionTextView" />
+
+    <TextView
+        android:id="@+id/epaRegionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:text="EPA Region:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/regulateTextView" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/facilAdView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
