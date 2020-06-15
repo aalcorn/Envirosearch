@@ -6,6 +6,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -35,11 +38,12 @@ public class selectActivity extends AppCompatActivity {
     private CheckBox CWABox;
     private CheckBox RCRABox;
     private CheckBox SDWABox;
-    private AdView adView;
     private double radius = 0.5;
 
     private InterstitialAd mInterstitialAd;
 
+    private SoundPool soundPool;
+    private int popSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,12 @@ public class selectActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         requestPermission();
 
+        //initialize sound
+        soundPool = new SoundPool(6,AudioManager.STREAM_MUSIC,0);
 
+        popSound = soundPool.load(this, R.raw.pop,1);
+
+        //get shared preferences - used to see if the user has acknowledged the info is public
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         boolean firstStart = prefs.getBoolean("firstStart", true);
 
@@ -61,6 +70,7 @@ public class selectActivity extends AppCompatActivity {
         }
 
 
+        //initialize adds
         AdView adView = findViewById(R.id.selectAdView);
 
         MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
@@ -83,13 +93,16 @@ public class selectActivity extends AppCompatActivity {
         RCRABox = findViewById(R.id.RCRABox);
         SDWABox = findViewById(R.id.SDWABox);
 
+        //shows additional info about EPA statutes
         questButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                soundPool.play(popSound,1,1,0,0,1);
                 showMoreInfo();
             }
         });
 
+        //sends parameters to next activity, starts that activity and loads an advertisement while the map is searching
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +129,7 @@ public class selectActivity extends AppCompatActivity {
             }
         });
 
+        //updates the textview below the seekbar
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -143,10 +157,12 @@ public class selectActivity extends AppCompatActivity {
 
     }
 
+    //requests permission to use location
     private void requestPermission(){
         ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},1);
     }
 
+    //Appears only when the app is first run, or if the user does not acknowledge the info. If that is the case, closes the app
     private void firstStartDia() {
         new AlertDialog.Builder(selectActivity.this)
                 .setTitle("")
@@ -170,6 +186,7 @@ public class selectActivity extends AppCompatActivity {
                 }).create().show();
     }
 
+    //creates an alertdialog that tells the user the information is obtained publicly
     private void showMoreInfo() {
         new AlertDialog.Builder(selectActivity.this)
                 .setTitle("More Info:")
@@ -180,5 +197,12 @@ public class selectActivity extends AppCompatActivity {
 
                     }
                 }).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundPool.release();
+        soundPool = null;
     }
 }

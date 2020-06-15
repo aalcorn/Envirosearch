@@ -10,6 +10,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.DrawableContainer;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -84,6 +87,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private InterstitialAd mInterstitialAd;
 
+    private SoundPool soundPool;
+    private int popSound;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestPermission();
@@ -93,6 +100,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC,0);
+
+        popSound = soundPool.load(this, R.raw.pop,1);
 
         MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
 
@@ -105,7 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mInterstitialAd.loadAd(adRequest);
 
-
+        //get parameters from selectActivity
         radius = Double.parseDouble(getIntent().getExtras().getString("radius"));
         boxChecked = getIntent().getExtras().getBoolean("checked");
         CAAChecked = getIntent().getExtras().getBoolean("CAAChecked");
@@ -116,6 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         legend = findViewById(R.id.imgView);
         showhide = findViewById(R.id.hideButton);
 
+        //toggles visibility of the legend
         showhide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,9 +172,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getLoc();
     }
 
+
     public void getLoc() {
         if(ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             lat = 15; lon = 15;
+            showToast("Location Permissions Denied!");
             return;
         }
         client.getLastLocation().addOnSuccessListener(MapsActivity.this, new OnSuccessListener<Location>() {
@@ -174,11 +188,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lat = Math.round(location.getLatitude()*100.0)/100.0;
                     lon = Math.round(location.getLongitude()*100.0)/100.0;
                     LatLng userLoc = new LatLng(lat,lon);
-                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    LatLng whiteHouse = new LatLng(38.8977,-77.0365);
+                    mMap.addMarker(new MarkerOptions().position(whiteHouse).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                     float zoomLevel = 14.0f; //14.5 good for .5 mile, 11.0 good for 6.5 miles.
                     zoomLevel -= radius*.6;
-                    //todo: Add custom zoom level based on the radius
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(whiteHouse,zoomLevel));
                     getJson();
                 }
 
@@ -278,6 +292,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 final String CWA = obj.getString("CWAComplianceStatus");
                 final String RCRA = obj.getString("RCRAComplianceStatus");
                 final String SDWA = obj.getString("SDWAComplianceStatus");
+
+
 
 
 
@@ -392,6 +408,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 marker.setTag(marker.getSnippet());
                                 marker.setSnippet(null);
                             }
+                            soundPool.play(popSound,1,1,0,0,1);
                             return false;
                         }
                     });
