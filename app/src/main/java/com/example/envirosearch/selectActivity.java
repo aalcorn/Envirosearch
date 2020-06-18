@@ -188,7 +188,7 @@ public class selectActivity extends AppCompatActivity {
 
     //creates an alertdialog that tells the user the information is obtained publicly
     private void showMoreInfo() {
-        new AlertDialog.Builder(selectActivity.this)
+        /*new AlertDialog.Builder(selectActivity.this)
                 .setTitle("More Info:")
                 .setMessage("CAA: Clean Air Act\nCWA: Clean Water Act\nRCRA: Resource Conservation and Recovery Act \nSDWA: Safe Drinking Water Act ")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -196,7 +196,10 @@ public class selectActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
-                }).show();
+                }).show();*/
+
+        Intent intent = new Intent(selectActivity.this, moreInfoActivity.class);
+        startActivity(intent);
     }
 
     @Override

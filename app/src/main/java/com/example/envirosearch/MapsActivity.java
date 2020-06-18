@@ -188,11 +188,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lat = Math.round(location.getLatitude()*100.0)/100.0;
                     lon = Math.round(location.getLongitude()*100.0)/100.0;
                     LatLng userLoc = new LatLng(lat,lon);
-                    LatLng whiteHouse = new LatLng(38.8977,-77.0365);
-                    mMap.addMarker(new MarkerOptions().position(whiteHouse).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    //LatLng whiteHouse = new LatLng(38.8977,-77.0365);
+                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                     float zoomLevel = 14.0f; //14.5 good for .5 mile, 11.0 good for 6.5 miles.
                     zoomLevel -= radius*.6;
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(whiteHouse,zoomLevel));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
                     getJson();
                 }
 

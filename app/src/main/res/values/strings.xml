@@ -2,4 +2,12 @@
     <string name="app_name">Envirosearch</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_select">Envirosearch</string>
+    <string name="SDWA_info">In 1974, Congress passed the Safe Drinking Water Act (SWDA) to regulate and protect the nation\'s public drinking water supply (EPA, 2004). The SDWA empowers the United States Environmental Protection Agency (US EPA) to set national health-based standards for drinking water. The guidelines help protect public drinking water from human-made or naturally occurring contaminants.</string>
+    <string name="RCRA_info">In 1976, Congress passed the Resource Conservation and Recovery Act (RCRA). RCRA gives the United States Environmental Protection Agency (US EPA) authorization to control the disposal of solid and hazardous wastes. The EPA achieves this by developing regulations, guidance, policies, and programs that ensure the safe management and cleanup of solid and hazardous wastes (EPA, 2017).</string>
+    <string name="CAA_info">In 1970, the Clean Air Act (CAA) established a mechanism of protection of human health and the environment throughout the United States. The CAA is a federal law that regulates air emissions from mobile and stationary sources (EPA, 2017). This act gives the United States Environmental Protection Agency (US EPA) authorization to establish the National Ambient Air Quality Standards (NAAQS). </string>
+    <string name="CWA_info">In 1972, the Federal Water Pollution Control Act formally became known as the Clean Water Act (CWA). The CWA regulates surface water quality and discharge of pollutants into the waters of the United States (EPA, 2017). The CWA makes it illegal to discharge any pollutant from a point source into navigable water without a permit. </string>
+    <string name="SDWA_link"><u>https://www.epa.gov/sites/production/files/2015-04/documents/epa816f04030.pdf</u></string>
+    <string name="RCRA_link"><u>https://www.epa.gov/rcra/resource-conservation-and-recovery-act-rcra-overview#whatisrcra</u></string>
+    <string name="CAA_link"><u>https://www.epa.gov/laws-regulations/summary-clean-air-act</u></string>
+    <string name="CWA_link"><u>https://www.epa.gov/laws-regulations/summary-clean-water-act </u></string>
 </resources>
