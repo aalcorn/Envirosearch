@@ -305,16 +305,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
                                     //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.redwater);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.cwared);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.redsmoke);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.caared);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.redhazard);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.rcrared);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.reddrinkingwater);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.sdwared);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
                                     mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
@@ -332,16 +332,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
                                     //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangewater);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.cwayellow);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangesmoke);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.caayellow);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangehazard);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.rcrayellow);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.orangedrinkingwater);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.sdwayellow);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
                                     mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
@@ -359,16 +359,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
                                     //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greenwater);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.cwagreen);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greensmoke);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.caagreen);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greenhazard);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.rcragreen);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.greendrinkingwater);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.sdwagreen);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
                                     mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
