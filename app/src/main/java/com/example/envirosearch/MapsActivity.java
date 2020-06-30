@@ -89,7 +89,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private SoundPool soundPool;
     private int popSound;
+    private int caaSound;
+    private int cwaSound;
+    private int rcraSound;
+    private int sdwaSound;
 
+    //TODO: Swap out API key when app launches!
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +109,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC,0);
 
         popSound = soundPool.load(this, R.raw.pop,1);
+        caaSound = soundPool.load(this, R.raw.caa,1);
+        cwaSound = soundPool.load(this, R.raw.cwa,1);
+        rcraSound = soundPool.load(this, R.raw.rcra,1);
+        sdwaSound = soundPool.load(this, R.raw.sdwa,1);
 
         MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
 
@@ -133,11 +142,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 if (legend.getVisibility() == View.VISIBLE) {
                     legend.setVisibility(View.INVISIBLE);
-                    showhide.setText("SHOW");
+                    showhide.setText("Show Legend");
                 }
                 else {
                     legend.setVisibility(View.VISIBLE);
-                    showhide.setText("HIDE");
+                    showhide.setText("Hide legend");
                 }
             }
         });
@@ -189,9 +198,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lon = Math.round(location.getLongitude()*100.0)/100.0;
                     LatLng userLoc = new LatLng(lat,lon);
                     //LatLng whiteHouse = new LatLng(38.8977,-77.0365);
-                    mMap.addMarker(new MarkerOptions().position(userLoc).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                    float zoomLevel = 14.0f; //14.5 good for .5 mile, 11.0 good for 6.5 miles.
+                    LatLng hgs = new LatLng(33.61,-85.8);
+                    //lat = 33.61;
+                    //lon = -85.8;
+                    makeMarker(userLoc,"Your Location",null, R.drawable.poslogo);
+                    //mMap.addMarker(new MarkerOptions().position(hgs).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    float zoomLevel = 15.0f; //14.5 good for .5 mile, 11.0 good for 6.5 miles.
+                    //float MAX_ZOOM = 15.0f;
+                    float MIN_ZOOM = 11.0f;
                     zoomLevel -= radius*.6;
+                    if (zoomLevel < MIN_ZOOM) {
+                        zoomLevel = MIN_ZOOM;
+                    }
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc,zoomLevel));
                     getJson();
                 }
@@ -274,6 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         JSONObject Results = new JSONObject(facilities.get("Results").toString()); // JSON object containing JSON arrays and data
 
+        //If there are too many facilities, it returns clusters instead of facilities with much less information.
         if (Results.getInt("QueryRows") < 4950) {
             final JSONArray facList = new JSONArray(Results.get("Facilities").toString()); // A list of JSON objects of facilities
             System.out.println(facList.length());
@@ -305,19 +324,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
                                     //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.cwared);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 1", R.drawable.cwar);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.caared);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 2", R.drawable.caared);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.rcrared);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 3", R.drawable.rcrar);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.sdwared);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 4", R.drawable.sdwared);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                                    //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
@@ -332,19 +351,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
                                     //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.cwayellow);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 1", R.drawable.cwayellow);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.caayellow);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 2", R.drawable.caay);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.rcrayellow);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 3", R.drawable.rcray);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.sdwayellow);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 4", R.drawable.sdwayellow);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                                    //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
@@ -359,19 +378,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng facLoc = new LatLng(Double.parseDouble(facilList.get(1)), Double.parseDouble(facilList.get(2)));
                                 if (!CWA.equals("null") && !CWA.equals("Not Applicable") && CWAChecked) {
                                     //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.fromResource(R.drawable.redwater)));
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.cwagreen);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 1", R.drawable.cwag);
                                 }
                                 else if (!CAA.equals("null") && !CAA.equals("Not Applicable") && CAAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.caagreen);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 2", R.drawable.caag);
                                 }
                                 else if (!RCRA.equals("null") && !RCRA.equals("Not Applicable") && RCRAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.rcragreen);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 3", R.drawable.rcrag);
                                 }
                                 else if (!SDWA.equals("null") && !SDWA.equals("Not Applicable") && SDWAChecked) {
-                                    makeMarker(facLoc, facilList.get(0), facilList.get(3), R.drawable.sdwagreen);
+                                    makeMarker(facLoc, facilList.get(0), facilList.get(3) + " 4", R.drawable.sdwagreen);
                                 }
                                 else if(SDWAChecked && RCRAChecked && CAAChecked && CWAChecked){
-                                    mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                                    //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                 }
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet("https://echo.epa.gov/detailed-facility-report?fid=" + facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                 //mMap.addMarker(new MarkerOptions().position(facLoc).title(facilList.get(0)).snippet(facilList.get(3)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
@@ -392,8 +411,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //String website = "https://echo.epa.gov/detailed-facility-report?fid=" + marker.getTag();
                                 //Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(website));
                                 //startActivity(browserIntent);
+                                String str = marker.getTag().toString();
+                                String[] split = str.split(" ");
                                 Intent facilIntent = new Intent(MapsActivity.this, facilActivity.class);
-                                facilIntent.putExtra("id", marker.getTag().toString());
+
+                                facilIntent.putExtra("id", split[0]);
                                 startActivity(facilIntent);
                                 //System.out.println(marker.getTag());
                             }
@@ -401,14 +423,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
 
+                    //Store important information in the tag (for some reason there is no way to do this directly so we must take it from the snippet)
                     mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
-                            if(marker.getSnippet() != null) {
-                                marker.setTag(marker.getSnippet());
-                                marker.setSnippet(null);
+                            if (marker.getSnippet() == null) {
                             }
-                            soundPool.play(popSound,1,1,0,0,1);
+                            else if(!marker.getSnippet().equals("Click for more information")) {
+                                marker.setTag(marker.getSnippet());
+                                marker.setSnippet("Click for more information");
+                            }
+                            if (marker.getTag() != null) {
+                                String str = marker.getTag().toString();
+                                String[] split = str.split(" ");
+                                if(split[1].equals("1")) {
+                                    //play cwa sound
+                                    soundPool.play(cwaSound,1,1,0,0,1);
+                                }
+                                else if (split[1].equals("2")) {
+                                    //play caa sound
+                                    soundPool.play(caaSound,1,1,0,0,1);
+                                }
+                                else if (split[1].equals("3")) {
+                                    //play rcra sound
+                                    soundPool.play(rcraSound,1,1,0,0,1);
+                                }
+                                else if (split[1].equals("4")) {
+                                    //play sdwa sound
+                                    soundPool.play(sdwaSound,1,1,0,0,1);
+                                }
+                            }
+                            //soundPool.play(popSound,1,1,0,0,1);
                             return false;
                         }
                     });
@@ -422,6 +467,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    //actually a snackbar but I couldn't be bothered to change the name
     public void showToast(String text) {
         final String textToShow = text;
         runOnUiThread(new Runnable() {

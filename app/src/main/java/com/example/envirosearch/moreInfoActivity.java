@@ -22,8 +22,6 @@ public class moreInfoActivity extends AppCompatActivity {
 
         MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
 
-
-
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();

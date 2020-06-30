@@ -44,6 +44,7 @@ public class selectActivity extends AppCompatActivity {
 
     private SoundPool soundPool;
     private int popSound;
+    private int startSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,8 @@ public class selectActivity extends AppCompatActivity {
         soundPool = new SoundPool(6,AudioManager.STREAM_MUSIC,0);
 
         popSound = soundPool.load(this, R.raw.pop,1);
+        startSound = soundPool.load(this,R.raw.intro,1);
+
 
         //get shared preferences - used to see if the user has acknowledged the info is public
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
@@ -75,13 +78,15 @@ public class selectActivity extends AppCompatActivity {
 
         MobileAds.initialize(this, "ca-app-pub-1127915110935547~5457208872");
 
-
-
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
 
         adView.loadAd(adRequest);
+
+
+        soundPool.play(startSound,1,1,1,0,1);
+
 
         milesView = findViewById(R.id.milesView);
         seekBar = findViewById(R.id.seekBar);
@@ -121,7 +126,7 @@ public class selectActivity extends AppCompatActivity {
 
                 mInterstitialAd.setAdListener(new AdListener() {
                     public void onAdLoaded() {
-                        mInterstitialAd.show();
+                        //mInterstitialAd.show();
                     }
                 });
 
